@@ -5,11 +5,10 @@ import Main from './Main';
 
 function mapStateToProps(state) {
   return {
+    gameId: state.gameId,
     table: {
       cards: state.table.cards
     }
-    //posts: state.posts,
-    //comments: state.comments
   }
 }
 
