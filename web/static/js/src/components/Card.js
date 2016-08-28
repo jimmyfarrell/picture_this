@@ -5,7 +5,8 @@ const Card = React.createClass({
   render() {
     return (
       <div className="card">
-        Card
+        Cards: { this.props.table.cards }
+        <button onClick={ this.props.incrementCards.bind(null) }>Increment</button>
       </div>
     )
   }

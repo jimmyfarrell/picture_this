@@ -10,11 +10,19 @@ import rootReducer from './reducers/index';
 
 // create an object for the default data
 const defaultState = {
+  table: {
+    cards: 0
+  }
   //posts,
   //comments
 };
 
-const store = createStore(rootReducer, defaultState);
+const store =
+  createStore(
+    rootReducer,
+    defaultState,
+    window.devToolsExtension && window.devToolsExtension()
+  );
 
 export const history = syncHistoryWithStore(browserHistory, store);
 
