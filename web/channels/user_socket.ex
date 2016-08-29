@@ -2,7 +2,7 @@ defmodule PictureThis.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", PictureThis.RoomChannel
+  channel "room:*", PictureThis.RoomChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
