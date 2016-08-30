@@ -7,17 +7,18 @@ const Game = React.createClass({
     const socket = new Socket("/socket", { params: { token: window.userToken } });
     socket.connect();
 
-    this.channel = socket.channel("room:lobby", {});
+    this.channel = socket.channel(`room:${this.props.params.code}`, {});
     this.channel.join()
-      .receive("ok", resp => { console.log("Joined successfully", resp) })
-      .receive("error", resp => { console.log("Unable to join", resp) });
+      .receive('ok', resp => console.log('Joined successfully', resp))
+      .receive('error', resp => console.log('Unable to join', resp));
 
-    this.channel.on('new_msg', payload => {
-      console.log('new_msg', payload);
+    this.channel.on('new_msg', message => {
+      this.props.newMessage(message);
     });
   },
 
-  sendMessage() {
+  sendMessage(e) {
+    e.preventDefault();
     this.channel.push('new_msg', {
       body: this.refs.messageText.value,
       timestamp: new Date()
@@ -30,8 +31,13 @@ const Game = React.createClass({
       <div>
         Game Code: { this.props.params.code }
         <p>Share this code with the other players</p>
-        <input ref="messageText" />
-        <button onClick={ this.sendMessage }>Send</button>
+        <ul>
+          { this.props.messages.map((message, i) => <li key={ i }>{ message.timestamp }: { message.body }</li>) }
+        </ul>
+        <form onSubmit={ this.sendMessage }>
+          <input ref="messageText" />
+          <button type="submit">Send</button>
+        </form>
       </div>
     )
   }

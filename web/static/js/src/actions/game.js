@@ -1,6 +1,6 @@
-export function setGameId (gameId) {
+export function newMessage (message) {
   return {
-    type: 'SET_GAME_ID',
-    gameId
+    type: 'NEW_MESSAGE',
+    message
   };
 }

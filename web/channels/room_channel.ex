@@ -5,8 +5,8 @@ defmodule PictureThis.RoomChannel do
     {:ok, socket}
   end
 
-  def join("room:" <> _private_room_id, _params, _socket) do
-    {:error, %{reason: "unauthorized"}}
+  def join("room:" <> _private_room_id, _message, socket) do
+    {:ok, socket}
   end
 
   def handle_in("new_msg", payload, socket) do

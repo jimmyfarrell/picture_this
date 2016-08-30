@@ -1,2 +1,2 @@
 export { incrementCards } from './table';
-export { setGameId } from './game';
+export { newMessage } from './game';

@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 import rootReducer from './reducers';
 
 const defaultState = {
-  gameId: '',
+  messages: [],
   table: {
     cards: 0
   }

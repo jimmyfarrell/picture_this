@@ -5,7 +5,7 @@ import Main from './Main';
 
 function mapStateToProps(state) {
   return {
-    gameId: state.gameId,
+    messages: state.messages,
     table: {
       cards: state.table.cards
     }
