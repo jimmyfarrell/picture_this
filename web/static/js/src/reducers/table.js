@@ -1,8 +1,11 @@
 function table (state = {}, action) {
-  if (action.type === 'INCREMENT_CARDS') {
-    return Object.assign({}, state, { cards: state.cards + 1 });
-  } else {
-    return state;
+  switch (action.type) {
+    case 'INCREMENT_CARDS':
+      return Object.assign({}, state, { cards: state.cards + 1 });
+    case 'END_GAME':
+      return { cards: 0 };
+    default:
+      return state;
   }
 }
 

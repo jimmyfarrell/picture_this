@@ -44,12 +44,7 @@ defmodule PictureThis.GameController do
   end
 
   def delete(conn, %{"id" => code}) do
-    game = Repo.get_by(Game, code: code)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(game)
-
+    Game |> Repo.get_by!(code: code) |> Repo.delete!
     send_resp(conn, :no_content, "")
   end
 end

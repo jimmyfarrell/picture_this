@@ -1,2 +1,2 @@
 export { incrementCards } from './table';
-export { newMessage } from './game';
+export { newMessage, clearMessages } from './game';

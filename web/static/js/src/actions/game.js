@@ -4,3 +4,9 @@ export function newMessage (message) {
     message
   };
 }
+
+export function clearMessages () {
+  return {
+    type: 'END_GAME'
+  }
+}

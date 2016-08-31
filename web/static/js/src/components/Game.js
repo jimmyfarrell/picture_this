@@ -1,6 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router'
-import {Socket} from "phoenix"
+import { Socket } from "phoenix"
+import axios from 'axios';
 
 const Game = React.createClass({
   componentDidMount() {
@@ -26,6 +27,25 @@ const Game = React.createClass({
     this.refs.messageText.value = '';
   },
 
+  endGame() {
+    if (confirm('End the current game?')) {
+      const requestConfig = {
+        url: `/games/${this.props.params.code}`,
+        method: 'DELETE',
+        credentials: 'same-origin',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector("meta[name=csrf]").content
+        }
+      };
+
+      axios(requestConfig)
+        .then((res) => {
+          this.props.clearMessages();
+          this.props.router.push('/');
+        });
+    }
+  },
+
   render() {
     return (
       <div>
@@ -38,6 +58,7 @@ const Game = React.createClass({
           <input ref="messageText" />
           <button type="submit">Send</button>
         </form>
+        <button onClick={ this.endGame }>End Game</button>
       </div>
     )
   }
