@@ -1,12 +1,20 @@
-export function newMessage (message) {
+export function setGameCode(gameCode) {
   return {
-    type: 'NEW_MESSAGE',
-    message
+    type: 'SET_GAME_CODE',
+    gameCode
   };
 }
 
-export function clearMessages () {
+export function setPlayer(player) {
   return {
-    type: 'END_GAME'
-  }
+    type: 'SET_PLAYER',
+    player
+  };
+}
+
+export function setSocket(socket) {
+  return {
+    type: 'SET_SOCKET',
+    socket
+  };
 }

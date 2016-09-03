@@ -6,11 +6,11 @@ import axios from 'axios';
 
 const Home = React.createClass({
   newGame() {
-    const code = shortid.generate();
+    this.code = shortid.generate();
     const requestConfig = {
       url: '/games',
       method: 'POST',
-      data: { code },
+      data: { code: this.code },
       credentials: 'same-origin',
       headers: {
         'X-CSRF-TOKEN': document.querySelector("meta[name=csrf]").content
@@ -20,38 +20,55 @@ const Home = React.createClass({
     axios(requestConfig)
       .then((res) => {
         if (res.status === 201) {
-          this.props.router.push(`/game/${code}`);
+          this.props.setGameCode(this.code);
         }
       });
   },
 
   joinGame(e) {
     e.preventDefault();
-    const code = this.refs.code.value;
+    this.code = this.refs.code.value;
     const requestConfig = {
-      url: `/games/${code}`,
+      url: `/games/${this.code}`,
       method: 'GET'
     };
 
     axios(requestConfig)
       .then((res) => {
-        this.props.router.push(`/game/${code}`);
+        this.props.setGameCode(this.code);
         this.refs.code.value = '';
       }).catch((err) => {
       });
 
   },
 
+  enterGame(e) {
+    e.preventDefault();
+    this.props.setPlayer(this.refs.player.value);
+    this.props.router.push(`/game/${this.code}`);
+  },
+
   render() {
-    return (
-      <div>
-        <button onClick={ this.newGame }>New Game</button>
-        <form id="joinGameForm" onSubmit={ this.joinGame }>
-          <input ref="code" name="code" placeholder="Enter Game Code" required/>
-          <button type="submit">Join Game</button>
-        </form>
-      </div>
-    )
+    if (this.code) {
+      return (
+        <div>
+          <form onSubmit={ this.enterGame }>
+            <input ref="player" placeholder="Your Name" value={ this.props.player } required />
+            <button type="submit">Enter Game Room</button>
+          </form>
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          <button onClick={ this.newGame }>New Game</button>
+          <form onSubmit={ this.joinGame }>
+            <input ref="code" placeholder="Enter Game Code" required />
+            <button type="submit">Join Game</button>
+          </form>
+        </div>
+      )
+    }
   }
 });
 

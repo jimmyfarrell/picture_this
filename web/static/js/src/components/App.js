@@ -5,9 +5,13 @@ import Main from './Main';
 
 function mapStateToProps(state) {
   return {
+    gameCode: '',
     messages: state.messages,
-    table: {
-      cards: state.table.cards
+    socket: state.socket,
+    game: {
+      cards: state.game.cards,
+      code: state.game.code,
+      player: state.game.player
     }
   }
 }
