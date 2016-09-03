@@ -8,5 +8,6 @@ defmodule PictureThis.Repo.Migrations.CreateGame do
       timestamps()
     end
 
+    create index(:games, [:code], unique: true)
   end
 end

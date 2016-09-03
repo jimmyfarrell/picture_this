@@ -4,6 +4,7 @@ defmodule PictureThis.Game do
   schema "games" do
     field :code, :string
 
+    has_many :messages, PictureThis.Message
     timestamps()
   end
 
@@ -13,6 +14,7 @@ defmodule PictureThis.Game do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:code])
+    |> unique_constraint(:code)
     |> validate_required([:code])
   end
 end
