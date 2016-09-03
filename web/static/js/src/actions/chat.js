@@ -5,8 +5,15 @@ export function newMessage (message) {
   };
 }
 
+export function loadMessages (messages) {
+  return {
+    type: 'LOAD_MESSAGES',
+    messages
+  };
+}
+
 export function clearMessages () {
   return {
     type: 'END_GAME'
-  }
+  };
 }
