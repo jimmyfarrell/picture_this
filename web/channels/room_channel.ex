@@ -9,8 +9,16 @@ defmodule PictureThis.RoomChannel do
     {:ok, socket}
   end
 
-  def join("room:" <> _private_room_id, _message, socket) do
-    {:ok, socket}
+  def join("room:" <> game_code, _message, socket) do
+    messages =
+      Game
+      |> where(code: ^game_code)
+      |> preload(:messages)
+      |> Repo.one
+      |> Map.get(:messages)
+      |> Enum.map(fn(message) -> Map.delete(message, :game) end)
+
+    {:ok, messages, socket}
   end
 
   def handle_in("new_msg", payload, socket) do

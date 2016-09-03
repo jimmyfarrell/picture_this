@@ -7,7 +7,8 @@ const Chat = React.createClass({
   componentDidMount() {
     this.channel = this.props.socket.channel(`room:${this.props.game.code}`, {});
     this.channel.join()
-      .receive('ok', resp => {
+      .receive('ok', messages => {
+        this.props.loadMessages(messages);
         this.channel.push('new_msg', {
           body: `${this.props.game.player} joined the room`,
           sender: 'SYSTEM',
@@ -40,7 +41,7 @@ const Chat = React.createClass({
         <ul>
           { this.props.messages.map((message, i) => {
             if (message.sender === 'SYSTEM') {
-              return (<li class="system-message" key={ i }>{ message.body }</li>)
+              return (<li className="system-message" key={ i }>{ message.body }</li>)
             } else {
               return (<li key={ i }>{ message.sender }: { message.body }</li>)
             }

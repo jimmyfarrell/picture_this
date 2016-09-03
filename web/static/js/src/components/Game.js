@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 import { withRouter } from 'react-router'
 import { Socket } from "phoenix"
 import axios from 'axios';
@@ -30,6 +31,10 @@ const Game = React.createClass({
   render() {
     if (Object.keys(this.props.socket).length === 0) {
       return null;
+    } else if (!this.props.game.player) {
+      return (
+        <p>Invalid! <Link to="/">Go Home</Link> to Join a Game</p>
+      )
     } else {
       return (
         <div>
