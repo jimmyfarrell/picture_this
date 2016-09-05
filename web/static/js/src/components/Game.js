@@ -15,18 +15,34 @@ const Game = React.createClass({
     const channel = socket.channel(`game:${this.props.game.code}`, {player: this.props.game.player});
     this.props.setSocket(socket);
     this.props.setChannel(channel);
+
+    channel.join()
+      .receive('ok', messages => {
+        this.props.loadMessages(messages);
+      })
+      .receive('error', resp => console.log('Unable to join'));
+
+    channel.on('end_game', payload => {
+      alert(`${payload.player} has ended the game. You will be taken to the home page.`);
+      this.props.router.push('/');
+    });
   },
 
   componentWillMount() {
-    if (Object.keys(this.props.game.socket).length === 0) {
+    if (Object.keys(this.props.game.socket).length === 0 && this.props.game.player) {
       this.setupSocket();
     }
   },
 
-  componentWillUpdate(nextProps, nextState) {
-    if (Object.keys(this.props.game.socket).length === 0) {
+  componentDidUpdate(nextProps, nextState) {
+    if (Object.keys(this.props.game.socket).length === 0 && this.props.game.player) {
       this.setupSocket();
     }
+  },
+
+  componentWillUnmount() {
+    this.props.game.channel.leave();
+    this.props.endGame();
   },
 
   endGame() {
@@ -41,7 +57,10 @@ const Game = React.createClass({
       }
     };
 
-    axios(requestConfig).then(res => this.props.router.push('/'));
+    axios(requestConfig).then(res => {
+      this.props.game.channel.push('end_game');
+      this.props.router.push('/');
+    });
   },
 
   render() {

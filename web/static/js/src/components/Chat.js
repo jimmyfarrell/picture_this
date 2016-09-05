@@ -4,23 +4,14 @@ import { Socket } from "phoenix"
 import axios from 'axios';
 
 const Chat = React.createClass({
-  componentDidMount() {
+  componentWillMount() {
     const channel = this.props.game.channel;
-    channel.join()
-      .receive('ok', messages => {
-        this.props.loadMessages(messages);
-        channel.push('new_msg', {
-          body: `${this.props.game.player} joined the room`,
-          sender: 'SYSTEM',
-          timestamp: new Date()
-        });
-      })
-      .receive('error', resp => console.log('Unable to join'));
     channel.on('new_msg', message => this.props.newMessage(message));
-  },
-
-  componentWillUnmount() {
-    this.props.clearMessages();
+    channel.push('new_msg', {
+      body: `${this.props.game.player} joined the room`,
+      sender: 'SYSTEM',
+      timestamp: new Date()
+    });
   },
 
   sendMessage(e) {

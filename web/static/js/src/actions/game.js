@@ -25,3 +25,9 @@ export function setChannel(channel) {
     channel
   };
 }
+
+export function endGame() {
+  return {
+    type: 'END_GAME'
+  };
+}

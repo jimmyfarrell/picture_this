@@ -11,9 +11,3 @@ export function loadMessages (messages) {
     messages
   };
 }
-
-export function clearMessages () {
-  return {
-    type: 'END_GAME'
-  };
-}

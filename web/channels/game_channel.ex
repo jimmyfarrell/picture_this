@@ -58,7 +58,7 @@ defmodule PictureThis.GameChannel do
   end
 
   def handle_in("end_game", _payload, socket) do
-    broadcast! socket, "end_game", %{}
+    broadcast! socket, "end_game", %{player: socket.assigns.player}
     {:noreply, socket}
   end
 
@@ -67,8 +67,8 @@ defmodule PictureThis.GameChannel do
     {:noreply, socket}
   end
 
-  def handle_out("end_game", _payload, socket) do
-    push socket, "end_game", %{}
+  def handle_out("end_game", payload, socket) do
+    push socket, "end_game", payload
     {:noreply, socket}
   end
 end
