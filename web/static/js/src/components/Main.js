@@ -1,5 +1,4 @@
 import React from 'react';
-import shortid from 'shortid';
 
 const Main = React.createClass({
   render() {

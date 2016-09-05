@@ -1,8 +1,8 @@
 import axios from 'axios';
 import chance from 'chance';
 import React from 'react';
-import { push } from 'react-router-redux';
 import { withRouter } from 'react-router'
+import { push } from 'react-router-redux';
 
 const Home = React.createClass({
   newGame() {

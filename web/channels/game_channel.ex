@@ -31,6 +31,20 @@ defmodule PictureThis.GameChannel do
     end
   end
 
+  def handle_in("start_game", _payload, socket) do
+    "game:" <> game_code = socket.topic
+    game = Game |> Repo.get_by!(code: game_code)
+    changeset = Game.changeset(game, %{in_progress: true})
+    Repo.update(changeset)
+    broadcast! socket, "start_game", %{player: socket.assigns.player}
+    {:noreply, socket}
+  end
+
+  def handle_out("start_game", payload, socket) do
+    push socket, "start_game", payload
+    {:noreply, socket}
+  end
+
   def handle_in("end_game", _payload, socket) do
     "game:" <> game_code = socket.topic
     Game |> Repo.get_by!(code: game_code) |> Repo.delete!

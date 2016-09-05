@@ -1,5 +1,6 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+
 import * as actionCreators from '../actions';
 import Main from './Main';
 
@@ -9,6 +10,7 @@ function mapStateToProps(state) {
     messages: state.messages,
     game: {
       code: state.game.code,
+      in_progress: state.game.in_progress,
       player: state.game.player,
       socket: state.game.socket
     }

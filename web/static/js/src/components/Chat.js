@@ -10,7 +10,9 @@ const Chat = React.createClass({
       .receive('ok', messages => {
         this.props.loadMessages(messages);
       })
-      .receive('error', resp => console.log('Unable to join'));
+      .receive('error', res => {
+        alert('Something bad happened. Back to home!');
+      });
 
     this.channel.on('new_msg', message => this.props.newMessage(message));
 

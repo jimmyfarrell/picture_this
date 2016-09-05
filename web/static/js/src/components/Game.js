@@ -1,9 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router';
 import { Socket } from "phoenix"
-import { withRouter } from 'react-router'
+import React from 'react';
+import { Link, withRouter } from 'react-router';
 
 import Chat from './Chat';
+import Table from './Table';
 
 const Game = React.createClass({
   setupSocket() {
@@ -18,9 +18,6 @@ const Game = React.createClass({
     this.channel = socket.channel(`game:${gameCode}`);
 
     this.channel.join()
-      .receive('ok', messages => {
-        this.props.loadMessages(messages);
-      })
       .receive('error', res => {
         alert('Something bad happened. Back to home!');
       });
@@ -29,6 +26,10 @@ const Game = React.createClass({
       alert(`${payload.player} has ended the game. ` +
             'You will be taken to the home page.');
       this.props.router.push('/');
+    });
+
+    this.channel.on('start_game', () => {
+      this.props.startGame();
     });
   },
 
@@ -53,8 +54,14 @@ const Game = React.createClass({
     this.props.endGame();
   },
 
-  endGame() {
-    if (confirm('End the current game?')) {
+  startGame() {
+    if (confirm('Are players in the room?')) {
+      this.channel.push('start_game');
+    }
+  },
+
+  cancelGame() {
+    if (confirm('Are you sure you want to cancel the game?')) {
       this.channel.push('end_game');
       this.props.router.push('/');
     }
@@ -67,16 +74,26 @@ const Game = React.createClass({
     } else if (!this.props.game.player) {
       return (
         <p>Invalid! <Link to="/">Go Home</Link> to Join a Game</p>
-      )
-    } else {
+      );
+    } else if (!this.props.game.in_progress) {
       return (
         <div>
           Game Code: { this.props.params.code }
           <p>Share this code with the other players</p>
+          <p>If everyone is here, you can start the game.</p>
+          <button onClick={ this.startGame }>Start Game</button>
+          <button onClick={ this.cancelGame }>Cancel Game</button>
           <Chat { ...this.props } />
-          <button onClick={ this.endGame }>End Game</button>
         </div>
-      )
+      );
+    } else {
+      return (
+        <div>
+          <Table { ...this.props } />
+          <button onClick={ this.endGame }>End Game</button>
+          <Chat { ...this.props } />
+        </div>
+      );
     }
   }
 });

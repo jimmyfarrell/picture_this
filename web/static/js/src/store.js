@@ -1,6 +1,6 @@
-import { createStore } from 'redux';
-import { syncHistoryWithStore } from 'react-router-redux';
 import { browserHistory } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
+import { createStore } from 'redux';
 
 import rootReducer from './reducers';
 
@@ -8,6 +8,7 @@ const defaultState = {
   messages: [],
   game: {
     code: '',
+    in_progress: false,
     player: localStorage.getItem('player') || '',
     socket: {}
   }
@@ -15,8 +16,8 @@ const defaultState = {
 
 const store =
   createStore(
-    rootReducer,
     defaultState,
+    rootReducer,
     window.devToolsExtension && window.devToolsExtension()
   );
 

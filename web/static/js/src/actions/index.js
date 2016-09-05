@@ -1,2 +1,2 @@
-export { newMessage, loadMessages } from './chat';
-export { setGameCode, setPlayer, setSocket, endGame } from './game';
+export { * } from './chat';
+export { * } from './game';
