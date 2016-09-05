@@ -8,9 +8,13 @@ import Chat from './Chat';
 
 const Game = React.createClass({
   componentWillMount() {
-    const socket = new Socket("/socket", { params: { token: window.userToken } });
+    const socket = new Socket("/socket", {
+      params: { token: window.userToken, player: this.props.game.player }
+    });
     socket.connect();
+    const channel = socket.channel(`game:${this.props.game.code}`, {player: this.props.game.player});
     this.props.setSocket(socket);
+    this.props.setChannel(channel);
   },
 
   endGame() {
@@ -29,7 +33,7 @@ const Game = React.createClass({
   },
 
   render() {
-    if (Object.keys(this.props.socket).length === 0) {
+    if (Object.keys(this.props.game.socket).length === 0) {
       return null;
     } else if (!this.props.game.player) {
       return (

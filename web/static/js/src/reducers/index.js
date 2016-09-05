@@ -1,14 +1,12 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 
-import messages from './messages';
-import socket from './socket';
 import game from './game';
+import messages from './messages';
 
 const rootReducer = combineReducers({
   game,
   messages,
-  socket,
   routing: routerReducer
 });
 

@@ -5,19 +5,18 @@ import axios from 'axios';
 
 const Chat = React.createClass({
   componentDidMount() {
-    this.channel = this.props.socket.channel(`game:${this.props.game.code}`, {player: this.props.game.player});
-    this.channel.join()
+    const channel = this.props.game.channel;
+    channel.join()
       .receive('ok', messages => {
         this.props.loadMessages(messages);
-        this.channel.push('new_msg', {
+        channel.push('new_msg', {
           body: `${this.props.game.player} joined the room`,
           sender: 'SYSTEM',
-          timestamp: new Date(),
-          game_code: this.props.game.code
+          timestamp: new Date()
         });
       })
       .receive('error', resp => console.log('Unable to join'));
-    this.channel.on('new_msg', message => this.props.newMessage(message));
+    channel.on('new_msg', message => this.props.newMessage(message));
   },
 
   componentWillUnmount() {
@@ -26,11 +25,10 @@ const Chat = React.createClass({
 
   sendMessage(e) {
     e.preventDefault();
-    this.channel.push('new_msg', {
+    this.props.game.channel.push('new_msg', {
       body: this.refs.messageText.value,
       sender: this.props.game.player,
-      timestamp: new Date(),
-      game_code: this.props.game.code
+      timestamp: new Date()
     });
     this.refs.messageText.value = '';
   },

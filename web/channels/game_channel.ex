@@ -6,7 +6,7 @@ defmodule PictureThis.GameChannel do
   alias PictureThis.Repo
 
   def join("game:" <> game_code, %{"player" => player}, socket) do
-    game = Game |> where(code: ^game_code) |> preload(:messages) |> Repo.one
+    game = Game |> Repo.get_by(code: game_code) |> Repo.preload(:messages)
     players =
       case Map.get(game, :players) do
         nil -> [player]
@@ -26,17 +26,31 @@ defmodule PictureThis.GameChannel do
   end
 
   def terminate(_message, socket) do
+    "game:" <> game_code = socket.topic
+    game = Game |> Repo.get_by(code: game_code)
+    cond do
+      game && length(game.players) == 1 -> Repo.delete!(game)
+      game ->
+        players = List.delete(game.players, socket.assigns.player)
+        changeset = Game.changeset(game, %{players: players})
+        Repo.update(changeset)
+    end
   end
 
   def handle_in("new_msg", payload, socket) do
-    broadcast! socket, "new_msg", payload
-    game = Game |> where(code: ^payload["game_code"]) |> Repo.one
-    message =
-      (for {key, val} <- payload, into: %{}, do: {String.to_atom(key), val})
-      |> Map.delete(:game_code)
-      |> Map.put(:game_id, game.id)
-    changeset = Message.changeset(%Message{}, message)
-    Repo.insert(changeset)
+    "game:" <> game_code = socket.topic
+    game = Game |> Repo.get_by(code: game_code)
+    %{"body" => body, "timestamp" => timestamp} = payload
+    sender = payload["sender"] || socket.assigns.player
+    changeset =
+      Message.changeset(
+        %Message{},
+        %{body: body, timestamp: timestamp, game_id: game.id, sender: sender}
+      )
+    case Repo.insert(changeset) do
+      {:ok, message} -> broadcast! socket, "new_msg", Map.take(message, [:body, :sender, :timestamp])
+      _ -> nil
+    end
     {:noreply, socket}
   end
 

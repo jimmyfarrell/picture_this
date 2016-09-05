@@ -7,11 +7,12 @@ function mapStateToProps(state) {
   return {
     gameCode: '',
     messages: state.messages,
-    socket: state.socket,
     game: {
       cards: state.game.cards,
+      channel: state.game.channel,
       code: state.game.code,
-      player: state.game.player
+      player: state.game.player,
+      socket: state.game.socket
     }
   }
 }

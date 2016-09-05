@@ -18,3 +18,10 @@ export function setSocket(socket) {
     socket
   };
 }
+
+export function setChannel(channel) {
+  return {
+    type: 'SET_CHANNEL',
+    channel
+  };
+}

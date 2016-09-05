@@ -6,11 +6,12 @@ import rootReducer from './reducers';
 
 const defaultState = {
   messages: [],
-  socket: {},
   game: {
-    code: '',
     cards: 0,
-    player: ''
+    channel: {},
+    code: '',
+    player: '',
+    socket: {}
   }
 };
 
