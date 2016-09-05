@@ -1,22 +1,33 @@
 import React from 'react';
 import { withRouter } from 'react-router'
-import { Socket } from "phoenix"
-import axios from 'axios';
 
 const Chat = React.createClass({
   componentWillMount() {
-    const channel = this.props.game.channel;
-    channel.on('new_msg', message => this.props.newMessage(message));
-    channel.push('new_msg', {
+    this.channel =
+      this.props.game.socket.channel(`chat:${this.props.game.code}`);
+
+    this.channel.join()
+      .receive('ok', messages => {
+        this.props.loadMessages(messages);
+      })
+      .receive('error', resp => console.log('Unable to join'));
+
+    this.channel.on('new_msg', message => this.props.newMessage(message));
+
+    this.channel.push('new_msg', {
       body: `${this.props.game.player} joined the room`,
       sender: 'SYSTEM',
       timestamp: new Date()
     });
   },
 
+  componentWillUnmount() {
+    this.channel.leave();
+  },
+
   sendMessage(e) {
     e.preventDefault();
-    this.props.game.channel.push('new_msg', {
+    this.channel.push('new_msg', {
       body: this.refs.messageText.value,
       timestamp: new Date()
     });
@@ -29,9 +40,13 @@ const Chat = React.createClass({
         <ul>
           { this.props.messages.map((message, i) => {
             if (message.sender === 'SYSTEM') {
-              return (<li className="system-message" key={ i }>{ message.body }</li>);
+              return (
+                <li className="system-message" key={ i }>{ message.body }</li>
+              );
             } else {
-              return (<li key={ i }>{ message.sender }: { message.body }</li>);
+              return (
+                <li key={ i }>{ message.sender }: { message.body }</li>
+              );
             }
           }) }
         </ul>

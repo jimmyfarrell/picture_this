@@ -1,70 +1,68 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { withRouter } from 'react-router'
 import { Socket } from "phoenix"
-import axios from 'axios';
+import { withRouter } from 'react-router'
 
 import Chat from './Chat';
 
 const Game = React.createClass({
   setupSocket() {
-    const socket = new Socket("/socket", {
-      params: { token: window.userToken, player: this.props.game.player }
-    });
+    const { code: gameCode, player } = this.props.game;
+    const socket =
+      new Socket('/socket', {
+        params: { token: window.userToken, player }
+      });
     socket.connect();
-    const channel = socket.channel(`game:${this.props.game.code}`, {player: this.props.game.player});
     this.props.setSocket(socket);
-    this.props.setChannel(channel);
 
-    channel.join()
+    this.channel = socket.channel(`game:${gameCode}`);
+
+    this.channel.join()
       .receive('ok', messages => {
         this.props.loadMessages(messages);
       })
-      .receive('error', resp => console.log('Unable to join'));
+      .receive('error', res => {
+        alert('Something bad happened. Back to home!');
+      });
 
-    channel.on('end_game', payload => {
-      alert(`${payload.player} has ended the game. You will be taken to the home page.`);
+    this.channel.on('end_game', payload => {
+      alert(`${payload.player} has ended the game. ` +
+            'You will be taken to the home page.');
       this.props.router.push('/');
     });
   },
 
   componentWillMount() {
-    if (Object.keys(this.props.game.socket).length === 0 && this.props.game.player) {
+    const { code: gameCode, player } = this.props.game;
+    if (gameCode && player) {
       this.setupSocket();
     }
   },
 
   componentDidUpdate(nextProps, nextState) {
-    if (Object.keys(this.props.game.socket).length === 0 && this.props.game.player) {
+    const socketExists = !!Object.keys(this.props.game.socket).length;
+    const { code: gameCode, player } = this.props.game;
+    if (!socketExists && gameCode && player) {
       this.setupSocket();
+      this.forceUpdate();
     }
   },
 
   componentWillUnmount() {
-    this.props.game.channel.leave();
+    this.channel.leave();
     this.props.endGame();
   },
 
   endGame() {
-    if (!confirm('End the current game?')) return;
-
-    const requestConfig = {
-      url: `/games/${this.props.params.code}`,
-      method: 'DELETE',
-      credentials: 'same-origin',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector("meta[name=csrf]").content
-      }
-    };
-
-    axios(requestConfig).then(res => {
-      this.props.game.channel.push('end_game');
+    if (confirm('End the current game?')) {
+      this.channel.push('end_game');
       this.props.router.push('/');
-    });
+    }
   },
 
   render() {
-    if (Object.keys(this.props.game.socket).length === 0) {
+    const socketExists = !!Object.keys(this.props.game.socket).length;
+    if (!socketExists) {
       return null;
     } else if (!this.props.game.player) {
       return (
@@ -75,7 +73,7 @@ const Game = React.createClass({
         <div>
           Game Code: { this.props.params.code }
           <p>Share this code with the other players</p>
-          <Chat {...this.props} />
+          <Chat { ...this.props } />
           <button onClick={ this.endGame }>End Game</button>
         </div>
       )

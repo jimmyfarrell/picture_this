@@ -19,13 +19,6 @@ export function setSocket(socket) {
   };
 }
 
-export function setChannel(channel) {
-  return {
-    type: 'SET_CHANNEL',
-    channel
-  };
-}
-
 export function endGame() {
   return {
     type: 'END_GAME'

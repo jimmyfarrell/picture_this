@@ -3,6 +3,7 @@ defmodule PictureThis.UserSocket do
 
   ## Channels
   channel "game:*", PictureThis.GameChannel
+  channel "chat:*", PictureThis.ChatChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

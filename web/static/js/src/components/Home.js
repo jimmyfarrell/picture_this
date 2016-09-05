@@ -1,29 +1,13 @@
-import React from 'react';
-import { withRouter } from 'react-router'
-import { push } from 'react-router-redux';
-import shortid from 'shortid';
 import axios from 'axios';
+import chance from 'chance';
+import React from 'react';
+import { push } from 'react-router-redux';
+import { withRouter } from 'react-router'
 
 const Home = React.createClass({
   newGame() {
-    this.code = shortid.generate();
-    const requestConfig = {
-      url: '/games',
-      method: 'POST',
-      data: { code: this.code },
-      credentials: 'same-origin',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector("meta[name=csrf]").content
-      }
-    };
-
-    axios(requestConfig)
-      .then((res) => {
-        if (res.status === 201) {
-          this.game = res.data.data;
-          this.props.setGameCode(this.code);
-        }
-      });
+    this.code = new Chance().color({format: 'hex'}).slice(1);
+    this.props.setGameCode(this.code);
   },
 
   joinGame(e) {
@@ -40,16 +24,34 @@ const Home = React.createClass({
         this.refs.code.value = '';
         this.props.setGameCode(this.code);
       }).catch((err) => {
+        // TODO: Handle this error.
       });
 
   },
 
-  enterGame(e) {
+  validateGame(e) {
     e.preventDefault();
-    const player = this.refs.player.value;
-    if (!this.game.players || this.game.players.indexOf(player) === -1) {
-      this.props.setPlayer(player);
-      this.props.router.push(`/game/${this.code}`);
+
+    if (!this.game) {
+      const requestConfig = {
+        url: '/games',
+        method: 'POST',
+        data: { code: this.code },
+        credentials: 'same-origin',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector("meta[name=csrf]").content
+        }
+      };
+
+      axios(requestConfig)
+        .then((res) => {
+          if (res.status === 201) {
+            this.game = res.data.data;
+            this.enterGame();
+          }
+        });
+    } else if (this.game.players.indexOf(this.refs.player.value) === -1) {
+      this.enterGame();
     } else {
       this.refs.player.value = '';
       this.error = 'Someone in the game room already has that name.';
@@ -57,13 +59,24 @@ const Home = React.createClass({
     }
   },
 
+  enterGame() {
+    const player = this.refs.player.value;
+    this.props.setPlayer(player);
+    localStorage.setItem('player', player);
+    this.props.router.push(`/game/${this.code}`);
+  },
+
   render() {
     if (this.code) {
       const error = this.error ? (<p>{ this.error }</p>) : null;
       return (
         <div>
-          <form onSubmit={ this.enterGame }>
-            <input ref="player" placeholder="Your Name" value={ this.props.player } required />
+          <form onSubmit={ this.validateGame }>
+            <input
+              ref="player"
+              placeholder="Your Name"
+              defaultValue={ this.props.game.player }
+              required />
             <button type="submit">Enter Game Room</button>
           </form>
           { error }

@@ -7,9 +7,8 @@ import rootReducer from './reducers';
 const defaultState = {
   messages: [],
   game: {
-    channel: {},
     code: '',
-    player: '',
+    player: localStorage.getItem('player') || '',
     socket: {}
   }
 };
