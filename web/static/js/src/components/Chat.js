@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const Chat = React.createClass({
   componentDidMount() {
-    this.channel = this.props.socket.channel(`room:${this.props.game.code}`, {});
+    this.channel = this.props.socket.channel(`game:${this.props.game.code}`, {player: this.props.game.player});
     this.channel.join()
       .receive('ok', messages => {
         this.props.loadMessages(messages);
@@ -41,9 +41,9 @@ const Chat = React.createClass({
         <ul>
           { this.props.messages.map((message, i) => {
             if (message.sender === 'SYSTEM') {
-              return (<li className="system-message" key={ i }>{ message.body }</li>)
+              return (<li className="system-message" key={ i }>{ message.body }</li>);
             } else {
-              return (<li key={ i }>{ message.sender }: { message.body }</li>)
+              return (<li key={ i }>{ message.sender }: { message.body }</li>);
             }
           }) }
         </ul>
@@ -52,7 +52,7 @@ const Chat = React.createClass({
           <button type="submit">Send</button>
         </form>
       </div>
-    )
+    );
   }
 });
 

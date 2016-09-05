@@ -5,20 +5,27 @@ defmodule PictureThis.GameChannel do
   alias PictureThis.Message
   alias PictureThis.Repo
 
-  def join("room:lobby", _message, socket) do
-    {:ok, socket}
+  def join("game:" <> game_code, %{"player" => player}, socket) do
+    game = Game |> where(code: ^game_code) |> preload(:messages) |> Repo.one
+    players =
+      case Map.get(game, :players) do
+        nil -> [player]
+        current_players -> [player | current_players]
+      end
+    changeset = Game.changeset(game, %{players: players})
+    case Repo.update(changeset) do
+      {:ok, game} ->
+        messages =
+          game
+          |> Map.get(:messages)
+          |> Enum.map(fn(message) -> Map.delete(message, :game) end)
+        {:ok, messages, socket}
+      {:error, changeset} ->
+        {:error, %{reason: "internal error"}}
+    end
   end
 
-  def join("room:" <> game_code, _message, socket) do
-    messages =
-      Game
-      |> where(code: ^game_code)
-      |> preload(:messages)
-      |> Repo.one
-      |> Map.get(:messages)
-      |> Enum.map(fn(message) -> Map.delete(message, :game) end)
-
-    {:ok, messages, socket}
+  def terminate(_message, socket) do
   end
 
   def handle_in("new_msg", payload, socket) do
@@ -33,8 +40,18 @@ defmodule PictureThis.GameChannel do
     {:noreply, socket}
   end
 
+  def handle_in("end_game", _payload, socket) do
+    broadcast! socket, "end_game", %{}
+    {:noreply, socket}
+  end
+
   def handle_out("new_msg", payload, socket) do
     push socket, "new_msg", payload
+    {:noreply, socket}
+  end
+
+  def handle_out("end_game", _payload, socket) do
+    push socket, "end_game", %{}
     {:noreply, socket}
   end
 end

@@ -9,7 +9,7 @@ defmodule PictureThis.GameController do
   end
 
   def create(conn, %{"code" => code}) do
-    changeset = Game.changeset(%Game{}, %{code: code})
+    changeset = Game.changeset(%Game{}, %{code: code, in_progress: false})
 
     case Repo.insert(changeset) do
       {:ok, game} ->
