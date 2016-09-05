@@ -10,7 +10,11 @@ defmodule PictureThis.GameView do
   end
 
   def render("game.json", %{game: game}) do
-    %{id: game.id,
-      code: game.code}
+    %{
+      id: game.id,
+      code: game.code,
+      players: game.players,
+      in_progress: game.in_progress
+    }
   end
 end

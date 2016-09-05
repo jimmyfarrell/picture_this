@@ -20,6 +20,7 @@ const Home = React.createClass({
     axios(requestConfig)
       .then((res) => {
         if (res.status === 201) {
+          this.game = res.data.data;
           this.props.setGameCode(this.code);
         }
       });
@@ -35,8 +36,9 @@ const Home = React.createClass({
 
     axios(requestConfig)
       .then((res) => {
-        this.props.setGameCode(this.code);
+        this.game = res.data.data;
         this.refs.code.value = '';
+        this.props.setGameCode(this.code);
       }).catch((err) => {
       });
 
@@ -44,20 +46,29 @@ const Home = React.createClass({
 
   enterGame(e) {
     e.preventDefault();
-    this.props.setPlayer(this.refs.player.value);
-    this.props.router.push(`/game/${this.code}`);
+    const player = this.refs.player.value;
+    if (!this.game.players || this.game.players.indexOf(player) === -1) {
+      this.props.setPlayer(player);
+      this.props.router.push(`/game/${this.code}`);
+    } else {
+      this.refs.player.value = '';
+      this.error = 'Someone in the game room already has that name.';
+      this.forceUpdate()
+    }
   },
 
   render() {
     if (this.code) {
+      const error = this.error ? (<p>{ this.error }</p>) : null;
       return (
         <div>
           <form onSubmit={ this.enterGame }>
             <input ref="player" placeholder="Your Name" value={ this.props.player } required />
             <button type="submit">Enter Game Room</button>
           </form>
+          { error }
         </div>
-      )
+      );
     } else {
       return (
         <div>
@@ -67,7 +78,7 @@ const Home = React.createClass({
             <button type="submit">Join Game</button>
           </form>
         </div>
-      )
+      );
     }
   }
 });

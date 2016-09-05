@@ -7,7 +7,7 @@ import axios from 'axios';
 import Chat from './Chat';
 
 const Game = React.createClass({
-  componentWillMount() {
+  setupSocket() {
     const socket = new Socket("/socket", {
       params: { token: window.userToken, player: this.props.game.player }
     });
@@ -15,6 +15,18 @@ const Game = React.createClass({
     const channel = socket.channel(`game:${this.props.game.code}`, {player: this.props.game.player});
     this.props.setSocket(socket);
     this.props.setChannel(channel);
+  },
+
+  componentWillMount() {
+    if (Object.keys(this.props.game.socket).length === 0) {
+      this.setupSocket();
+    }
+  },
+
+  componentWillUpdate(nextProps, nextState) {
+    if (Object.keys(this.props.game.socket).length === 0) {
+      this.setupSocket();
+    }
   },
 
   endGame() {

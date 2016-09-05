@@ -27,7 +27,6 @@ const Chat = React.createClass({
     e.preventDefault();
     this.props.game.channel.push('new_msg', {
       body: this.refs.messageText.value,
-      sender: this.props.game.player,
       timestamp: new Date()
     });
     this.refs.messageText.value = '';

@@ -11,6 +11,7 @@ defmodule PictureThis.GameChannel do
       case Map.get(game, :players) do
         nil -> [player]
         current_players -> [player | current_players]
+        _ -> nil
       end
     changeset = Game.changeset(game, %{players: players})
     case Repo.update(changeset) do
@@ -22,6 +23,7 @@ defmodule PictureThis.GameChannel do
         {:ok, messages, socket}
       {:error, changeset} ->
         {:error, %{reason: "internal error"}}
+      _ -> nil
     end
   end
 
@@ -34,6 +36,7 @@ defmodule PictureThis.GameChannel do
         players = List.delete(game.players, socket.assigns.player)
         changeset = Game.changeset(game, %{players: players})
         Repo.update(changeset)
+      true -> nil
     end
   end
 
