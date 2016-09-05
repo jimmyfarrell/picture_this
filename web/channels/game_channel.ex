@@ -1,9 +1,9 @@
-defmodule PictureThis.RoomChannel do
+defmodule PictureThis.GameChannel do
   use Phoenix.Channel
-  alias PictureThis.Message
-  alias PictureThis.Game
-  alias PictureThis.Repo
   import Ecto.Query
+  alias PictureThis.Game
+  alias PictureThis.Message
+  alias PictureThis.Repo
 
   def join("room:lobby", _message, socket) do
     {:ok, socket}
